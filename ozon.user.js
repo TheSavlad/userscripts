@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Ozon Helper
 // @namespace    https://www.ozon.ru
-// @version      1.0
+// @version      1.1
 // @description  Set of tweaks to Ozon website
 // @author       Savlad
 // @match        https://www.ozon.ru/my/orderlist*
@@ -14,11 +14,14 @@
 (function () {
   "use strict";
 
+  const ozon = window.ozon;
+  delete window.ozon;
+
   // select a handler based on pathname
   switch (location.pathname.toLowerCase()) {
     case "/my/orderlist":
-      return window.ozon.orderlist();
+      return ozon.orderlist();
     default:
-      return window.ozon.log("Unknown pathname:", location.pathname);
+      return ozon.log("Unknown pathname:", location.pathname);
   }
 })();
