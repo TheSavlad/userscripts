@@ -168,13 +168,66 @@
       "}",
     ];
 
+    // Query selectors cache
+    // Populated by findSelectors()
+    const selectors = {
+      header: "",
+      paginator: "",
+      order: "",
+      orderState: "",
+    };
+
+    /**
+     * @param {Element | null | undefined} el
+     * @returns {string}
+     */
+    function getClassName(el) {
+      return Object.values(el?.classList || [])
+        .map((x) => `.${x}`)
+        .join("");
+    }
+    function findSelectors() {
+      selectors.header = '[data-widget="header"]>div:first-child';
+      selectors.paginator = '[data-widget="paginator"]>div';
+
+      const orderList = $("[data-widget=orderList]");
+      if (!orderList) throw new Error("order list not found");
+      const orderImage = $(orderList, "img");
+      if (!orderImage) throw new Error("order image not found");
+      const orderCandidates = Array.from(
+        orderList.firstElementChild?.children ?? []
+      );
+
+      let el = orderImage.parentElement;
+      while (el !== orderList) {
+        if (!el) throw new Error("no parent element");
+        if (orderCandidates.includes(el)) {
+          selectors.order = getClassName(el.firstElementChild);
+          break;
+        }
+        el = el.parentElement;
+      }
+
+      if (!selectors.order) throw new Error("order selector not found");
+      selectors.order = `[data-widget="orderList"] ${selectors.order}`;
+
+      const order = $(orderList, selectors.order);
+      if (!order) throw new Error("order selector failed");
+
+      const orderState = $(order, "div>span:first-child:last-child");
+      if (!orderState) throw new Error("order state selector failed");
+      selectors.orderState = getClassName(orderState);
+
+      log("selectors =", selectors);
+    }
+
     /**
      * @param {HTMLElement} row
      * @param {OzonOrder} order
      * @returns {void | true}
      */
     function parseOrderState(row, order) {
-      const stateElement = $(row, ".e5u_14");
+      const stateElement = $(row, selectors.orderState);
       if (!stateElement) return error("state element not found for", row);
 
       const stateText = stateElement.innerText.toLowerCase();
@@ -191,14 +244,26 @@
      */
     function parseOrderDate(row, order) {
       // Date found in a different element when order is ready to pick up
-      const dateClass =
-        order.state === ORDER_STATE_READY ? ".u4e_14" : ".ew4_14";
+      /** @type {HTMLElement | null | undefined} */
+      let dateElement = null;
 
-      const dateElement = $(row, dateClass);
+      if (order.state === ORDER_STATE_READY) {
+        const svg = $(row, "svg");
+        if (svg) {
+          dateElement = /** @type {HTMLElement} */ (svg.previousElementSibling);
+        }
+      }
+      if (!dateElement) {
+        dateElement = $(row, "p");
+      }
+
       if (!dateElement) return error("date element not found for", row);
 
       const dateMatch = /(\d+) ([а-яё]+)/.exec(dateElement.innerText.trim());
-      if (!dateMatch) return error("invalid date string in", dateElement);
+      if (!dateMatch) {
+        if (dateElement.innerText.includes("уточн")) return true;
+        return error("invalid date string in", dateElement);
+      }
 
       const [fullMatch, numStr, monStr] = dateMatch;
       order.date = fullMatch; // Store original string for later grouping
@@ -219,11 +284,12 @@
       return true;
     }
     /**
-     * @param {HTMLElement} child
+     * @param {HTMLElement | null} child
      * @param {OzonOrder} order
      * @returns {OzonOrderItem | void}
      */
     function parseOrderItem(child, order) {
+      if (!child) return error("invalid order item element");
       if (child.tagName !== "A") return error("element not <a>:", child);
       const el = /** @type {HTMLAnchorElement} */ (child);
 
@@ -248,13 +314,13 @@
      */
     function parseOrder(row) {
       /** @type {OzonOrder} */
-      const order = { day: -1, month: -1, date: "", state: -1, items: [] };
+      const order = { day: 0, month: 0, date: "?", state: -1, items: [] };
       if (!parseOrderState(row, order)) return;
       if (!parseOrderDate(row, order)) return;
 
       // Handle individual items in the order
-      for (const child of $$(row, ".w5e_14")) {
-        const item = parseOrderItem(child, order);
+      for (const child of $$(row, "a>img")) {
+        const item = parseOrderItem(child.parentElement, order);
         if (!item) continue;
         order.items.push(item);
       }
@@ -269,7 +335,7 @@
     function parseOrders(paginator) {
       const orders = [];
       // Process every "row" of orders
-      for (const row of $$(paginator, "[data-widget=orderList] .w1e_14")) {
+      for (const row of $$(paginator, selectors.order)) {
         const order = parseOrder(row);
         if (!order) continue;
         orders.push(order);
@@ -469,7 +535,7 @@
     function onHeader(header, container) {
       log("updating header");
       // if true, we scrolled down and OZON header have stuck to the top of the screen
-      const isSticky = header.classList.contains("d4i_9");
+      const isSticky = header.classList.length > 1;
       log("header is sticky =", isSticky);
       container.classList.toggle("fixed", isSticky);
       container.classList.toggle("absolute", !isSticky);
@@ -477,9 +543,10 @@
 
     return function () {
       ozon.css(...css);
+      findSelectors();
 
       // Find native OZON header to stick to
-      const header = $("#stickyHeader");
+      const header = $(selectors.header);
       if (!header) return error("sticky header not found");
       log("stickyHeader =", header);
 
