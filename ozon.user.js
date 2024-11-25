@@ -14,8 +14,8 @@
 (function () {
   "use strict";
 
-  const ozon = window.ozon;
-  delete window.ozon;
+  const ozon = /** @type {any} */ (window).ozon;
+  delete (/** @type {any} */ (window).ozon);
 
   // select a handler based on pathname
   switch (location.pathname.toLowerCase()) {
