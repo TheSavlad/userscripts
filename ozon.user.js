@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Ozon Helper
 // @namespace    https://www.ozon.ru
-// @version      1.1
+// @version      1.2
 // @description  Set of tweaks to Ozon website
 // @author       Savlad
 // @match        https://www.ozon.ru/my/orderlist*
