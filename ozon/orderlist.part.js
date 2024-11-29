@@ -214,7 +214,7 @@
       const order = $(orderList, selectors.order);
       if (!order) throw new Error("order selector failed");
 
-      const orderState = $(order, "div>span:first-child:last-child");
+      const orderState = $(order, "div>span+svg")?.previousElementSibling;
       if (!orderState) throw new Error("order state selector failed");
       selectors.orderState = getClassName(orderState);
 
@@ -351,6 +351,17 @@
       /** @type {Record<string, OzonOrderGroup>} */
       const groups = {};
       for (const order of orders) {
+        const items = [];
+        // Add order items into group items
+        for (const item of order.items) {
+          // Skip cancelled orders
+          if (item.state === ORDER_STATE_CANCEL) continue;
+          items.push(item);
+        }
+
+        // Empty order or all items are cancelled: skip
+        if (items.length === 0) continue;
+
         // Create group if not found
         if (!groups[order.date]) {
           groups[order.date] = {
@@ -367,8 +378,7 @@
             orders: [],
           };
         }
-        // Add order items into group items
-        groups[order.date].orders.push(...order.items);
+        groups[order.date].orders.push(...items);
       }
 
       // Figure out group state based on items' state
@@ -480,6 +490,7 @@
         ),
         dom("div", { className: "ozon-order-date" }, group.str)
       );
+      el.dataset.state = group.state;
       target.appendChild(el);
     }
     /**
