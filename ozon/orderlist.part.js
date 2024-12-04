@@ -214,8 +214,11 @@
       const order = $(orderList, selectors.order);
       if (!order) throw new Error("order selector failed");
 
-      const orderState = $(order, "div>span+svg")?.previousElementSibling;
-      if (!orderState) throw new Error("order state selector failed");
+      let orderState = $(order, "div>span+svg")?.previousElementSibling;
+      if (!orderState) {
+        orderState = $(order, "div>span:first-child:last-child");
+        if (!orderState) throw new Error("order state selector failed");
+      }
       selectors.orderState = getClassName(orderState);
 
       log("selectors =", selectors);
