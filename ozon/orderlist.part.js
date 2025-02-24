@@ -92,8 +92,12 @@
     /** @type {[OzonCssParameter, ...string[]]} */
     const css = [
       {
-        "body #layoutPage>div>[data-widget=wallpaper]": {
+        "body #layoutPage>div>[data-widget=wallpaper]:last-child": {
           "margin-top": "179px",
+        },
+        "body #layoutPage>div>[data-widget=wallpaper]:first-child>div>header": {
+          "border-bottom-left-radius": "0px",
+          "border-bottom-right-radius": "0px",
         },
         ".ozon-helper-orders": {
           left: "0px",
@@ -264,7 +268,7 @@
 
       if (!dateElement) return error("date element not found for", row);
 
-      const dateMatch = /(\d+) ([а-яё]+)$/.exec(dateElement.innerText.trim());
+      const dateMatch = /(\d+) ([а-яё]+)/.exec(dateElement.innerText.trim());
       if (!dateMatch) {
         if (dateElement.innerText.includes("уточн")) return true;
         return error("invalid date string in", dateElement);
