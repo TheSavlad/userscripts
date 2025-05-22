@@ -8,7 +8,7 @@
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=ozon.ru
 // @grant        none
 // @require      https://raw.githubusercontent.com/TheSavlad/userscripts/refs/heads/main/ozon/general.min.js#sha256=4a0f6d017e4cd91185f80cd1c2cd297d886aaa4babdd5384e007e267b108304f
-// @require      https://raw.githubusercontent.com/TheSavlad/userscripts/refs/heads/main/ozon/orderlist.min.js#sha256=7c4f3147b6ee7c4ef83497ebdff54a1fbf443fed2b262b666e067ed499558f2c
+// @require      https://raw.githubusercontent.com/TheSavlad/userscripts/refs/heads/main/ozon/orderlist.min.js#sha256=3dcbda041bd87e5012916fdcbbb416ea3205df8b4c5c6ed57ffb98300967dd99
 // ==/UserScript==
 
 (function () {
