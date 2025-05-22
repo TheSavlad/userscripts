@@ -78,6 +78,10 @@
       "январ,феврал,март,апрел,ма,июн,июл,август,сентябр,октябр,ноябр,декабр".split(
         ","
       );
+    const dateRegex = new RegExp(
+      `(\\d+) ((?:${monthNeedles.join("|")})[a-яё]*)`,
+      "i"
+    );
     /** @type {Record<number, string>} */
     const stateNames = {
       [ORDER_STATE_CANCEL]: "🛑 Отменён",
@@ -268,7 +272,7 @@
 
       if (!dateElement) return error("date element not found for", row);
 
-      const dateMatch = /(\d+) ([а-яё]+)/.exec(dateElement.innerText.trim());
+      const dateMatch = dateRegex.exec(dateElement.innerText.trim());
       if (!dateMatch) {
         if (dateElement.innerText.includes("уточн")) return true;
         return error("invalid date string in", dateElement);
