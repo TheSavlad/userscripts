@@ -1,4 +1,4 @@
-# OZON
+# [OZON](ozon.user.js)
 Set of tweaks for Ozon website  
 Only one tweak so far though...
 
@@ -17,7 +17,7 @@ Main file [ozon.user.js](ozon.user.js) only has minimal code.
 * Cancelled items are filtered out.
 * Intelligent injection: should keep working even when devs mess up classnames.
 
-# Yandex Pogoda
+# [Yandex Pogoda](yandex_pogoda.user.js)
 Adds a button to the header that enables refreshes every ten minutes  
 (At ten-minute intervals, so 22:10, 22:20, 22:30, etc. Not 10 minutes after page load)
 
