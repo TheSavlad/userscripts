@@ -16,3 +16,11 @@ Main file [ozon.user.js](ozon.user.js) only has minimal code.
 * Each item shows thumbnail and current status.
 * Cancelled items are filtered out.
 * Intelligent injection: should keep working even when devs mess up classnames.
+
+# Yandex Pogoda
+Adds a button to the header that enables refreshes every ten minutes  
+(At ten-minute intervals, so 22:10, 22:20, 22:30, etc. Not 10 minutes after page load)
+
+* Waits one second for page to load at least minimally, then places the button.
+* Uses local storage for persistence.
+* Prints next reload time in console at *log* level with `[Refresh]` tag.
